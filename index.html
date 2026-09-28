@@ -257,6 +257,42 @@
   }
   .dotbtn.active{ background:var(--accent, var(--coral)); width:20px; border-radius:4px; }
 
+  .frag{
+    opacity:0;
+    transform:translateY(8px);
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  .frag.revealed{ opacity:1; transform:translateY(0); }
+  tr.frag{ transform:none; transition:opacity .4s ease; }
+  @media (prefers-reduced-motion: reduce){
+    .frag{ transition:none; transform:none; }
+  }
+
+  .legend{
+    display:flex; align-items:center; gap:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px; color:var(--text-faint); letter-spacing:0.02em;
+  }
+  .legend kbd{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    background:var(--surface-2); border:1px solid var(--border);
+    border-radius:4px; padding:1px 5px; color:var(--text-dim);
+  }
+  @media (max-width:640px){ .legend{ display:none; } }
+
+  .continue-hint{
+    display:inline-flex; align-items:center; gap:5px;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.04em;
+    color:var(--accent, var(--coral));
+    opacity:0; transition:opacity .3s ease;
+    margin-top:18px;
+  }
+  .continue-hint.show{ opacity:0.9; }
+  .continue-hint .ico{ display:inline-block; animation:bob 1.4s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(3px); } }
+  @media (prefers-reduced-motion: reduce){ .continue-hint .ico{ animation:none; } }
+
   ::-webkit-scrollbar{ width:8px; }
   ::-webkit-scrollbar-thumb{ background:var(--border); border-radius:4px; }
 </style>
@@ -267,6 +303,7 @@
 <div id="deck">
   <header class="topbar">
     <div class="brand"><span class="dot"></span>dbt <span style="color:var(--text-faint)">×</span> BigQuery</div>
+    <div class="legend"><kbd>↓</kbd> reveal <kbd>↑</kbd> undo <kbd>←</kbd><kbd>→</kbd> slides</div>
     <div class="counter"><b id="slideNum">01</b> / <span id="slideTotal">11</span></div>
   </header>
 
@@ -277,14 +314,15 @@
       <h1>From raw rows<br>to a trusted warehouse</h1>
       <p class="subtitle">How dbt and BigQuery turn scattered source tables into a documented, tested, dependency-aware pipeline &mdash; using nothing fancier than SELECT and WHERE.</p>
       <div class="diagram" style="margin-top:32px;">
-        <div class="dstep"><b>raw source</b>events, orders</div>
+        <div class="dstep frag"><b>raw source</b>events, orders</div>
         <span class="darrow">›</span>
-        <div class="dstep"><b>staging</b>cleaned, renamed</div>
+        <div class="dstep frag"><b>staging</b>cleaned, renamed</div>
         <span class="darrow">›</span>
-        <div class="dstep"><b>marts</b>business-ready</div>
+        <div class="dstep frag"><b>marts</b>business-ready</div>
         <span class="darrow">›</span>
-        <div class="dstep"><b>dashboard</b>trusted numbers</div>
+        <div class="dstep frag"><b>dashboard</b>trusted numbers</div>
       </div>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
@@ -293,26 +331,27 @@
       <p class="lede">Everything here assumes you can already write <code class="mono">SELECT</code> and <code class="mono">WHERE</code>. No window functions required &mdash; these concepts live one level up, in how models are organized, tested, documented, and physically built.</p>
       <div class="grid2">
         <ul class="points">
-          <li><b>source()</b> &mdash; point at raw data</li>
-          <li><b>ref()</b> &mdash; point at other models</li>
-          <li><b>materializations</b> &mdash; how a model gets built</li>
-          <li><b>partition_by</b> &mdash; how BigQuery stores it</li>
-          <li><b>unique_key</b> &mdash; how re-runs stay clean</li>
+          <li class="frag"><b>source()</b> &mdash; point at raw data</li>
+          <li class="frag"><b>ref()</b> &mdash; point at other models</li>
+          <li class="frag"><b>materializations</b> &mdash; how a model gets built</li>
+          <li class="frag"><b>partition_by</b> &mdash; how BigQuery stores it</li>
+          <li class="frag"><b>unique_key</b> &mdash; how re-runs stay clean</li>
         </ul>
         <ul class="points">
-          <li><b>macros</b> &mdash; reusable logic</li>
-          <li><b>tests</b> &mdash; built-in and custom checks</li>
-          <li><b>Great Expectations</b> &mdash; deeper data quality</li>
-          <li><b>schema.yml docs</b> &amp; <b>APPENDS()</b> &mdash; documentation + change tracking</li>
+          <li class="frag"><b>macros</b> &mdash; reusable logic</li>
+          <li class="frag"><b>tests</b> &mdash; built-in and custom checks</li>
+          <li class="frag"><b>Great Expectations</b> &mdash; deeper data quality</li>
+          <li class="frag"><b>schema.yml docs</b> &amp; <b>APPENDS()</b> &mdash; documentation + change tracking</li>
         </ul>
       </div>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
       <p class="eyebrow">Foundation</p>
       <h2>source() and ref()</h2>
       <p class="lede">Two functions decide the shape of your whole pipeline. <code class="mono">source()</code> names a raw table dbt doesn't manage. <code class="mono">ref()</code> names another dbt model. Together they let dbt draw the full map of what depends on what.</p>
-      <pre class="code"><span class="cm"># sources.yml &mdash; declare the raw table once</span>
+      <pre class="code frag"><span class="cm"># sources.yml &mdash; declare the raw table once</span>
 <span class="kw">sources</span>:
   - <span class="kw">name</span>: raw_ecommerce
     <span class="kw">tables</span>:
@@ -324,11 +363,12 @@
   customer_id,
   order_date
 <span class="kw">from</span> <span class="fn">{{ source(</span><span class="str">'raw_ecommerce'</span>, <span class="str">'orders'</span><span class="fn">) }}</span></pre>
-      <pre class="code"><span class="cm">-- models/marts/fct_orders.sql</span>
+      <pre class="code frag"><span class="cm">-- models/marts/fct_orders.sql</span>
 <span class="kw">select</span> *
 <span class="kw">from</span> <span class="fn">{{ ref(</span><span class="str">'stg_orders'</span><span class="fn">) }}</span>
 <span class="kw">where</span> order_date >= <span class="str">'2024-01-01'</span></pre>
-      <p class="lede" style="margin-top:6px;">Because <code class="mono">fct_orders</code> calls <code class="mono">ref('stg_orders')</code> instead of typing a table name, dbt knows to build <code class="mono">stg_orders</code> first, every time.</p>
+      <p class="lede frag" style="margin-top:6px;">Because <code class="mono">fct_orders</code> calls <code class="mono">ref('stg_orders')</code> instead of typing a table name, dbt knows to build <code class="mono">stg_orders</code> first, every time.</p>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
@@ -336,31 +376,33 @@
       <h2>ref() builds the DAG for you</h2>
       <p class="lede">A hardcoded table name is a dead end. A <code class="mono">ref()</code> is a live pointer &mdash; dbt reads every <code class="mono">ref()</code> and <code class="mono">source()</code> call in your project and assembles them into a directed acyclic graph: the same node network drifting behind this deck.</p>
       <div class="cardrow">
-        <div class="card"><span class="tag">Lineage</span><p>Every model's upstream and downstream dependencies are known automatically &mdash; no manual diagram to maintain.</p></div>
-        <div class="card"><span class="tag">Order</span><p>dbt runs models in the correct sequence, and can run just one branch of the graph.</p></div>
-        <div class="card"><span class="tag">Environments</span><p><code class="mono">source()</code> and <code class="mono">ref()</code> resolve to the right project/dataset per environment &mdash; dev, staging, prod &mdash; without editing SQL.</p></div>
+        <div class="card frag"><span class="tag">Lineage</span><p>Every model's upstream and downstream dependencies are known automatically &mdash; no manual diagram to maintain.</p></div>
+        <div class="card frag"><span class="tag">Order</span><p>dbt runs models in the correct sequence, and can run just one branch of the graph.</p></div>
+        <div class="card frag"><span class="tag">Environments</span><p><code class="mono">source()</code> and <code class="mono">ref()</code> resolve to the right project/dataset per environment &mdash; dev, staging, prod &mdash; without editing SQL.</p></div>
       </div>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
       <p class="eyebrow">Build strategy</p>
       <h2>Materializations</h2>
       <p class="lede">A materialization is dbt's answer to: <i>when this model runs, what does BigQuery actually end up storing?</i> Set it with one line of config.</p>
-      <pre class="code"><span class="fn">{{ config(</span>materialized=<span class="str">'table'</span><span class="fn">) }}</span></pre>
+      <pre class="code frag"><span class="fn">{{ config(</span>materialized=<span class="str">'table'</span><span class="fn">) }}</span></pre>
       <table class="spec">
         <tr><th>Type</th><th>What gets built</th><th>Use when</th></tr>
-        <tr><td><b>view</b></td><td>A saved query, no data stored</td><td>Small, cheap, always-fresh logic</td></tr>
-        <tr><td><b>table</b></td><td>Full table, rebuilt every run</td><td>Heavier logic, read often</td></tr>
-        <tr><td><b>incremental</b></td><td>Table updated with only new/changed rows</td><td>Large, append-heavy source data</td></tr>
-        <tr><td><b>ephemeral</b></td><td>Nothing &mdash; inlined as a CTE into callers</td><td>Small reusable snippet, no need for its own object</td></tr>
+        <tr class="frag"><td><b>view</b></td><td>A saved query, no data stored</td><td>Small, cheap, always-fresh logic</td></tr>
+        <tr class="frag"><td><b>table</b></td><td>Full table, rebuilt every run</td><td>Heavier logic, read often</td></tr>
+        <tr class="frag"><td><b>incremental</b></td><td>Table updated with only new/changed rows</td><td>Large, append-heavy source data</td></tr>
+        <tr class="frag"><td><b>ephemeral</b></td><td>Nothing &mdash; inlined as a CTE into callers</td><td>Small reusable snippet, no need for its own object</td></tr>
       </table>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="blue">
       <p class="eyebrow">BigQuery storage</p>
       <h2>partition_by</h2>
       <p class="lede">BigQuery can physically split a table into date-sized chunks. A query that filters on the partition column only reads the chunks it needs &mdash; less data scanned, lower cost, faster results. Still just <code class="mono">WHERE</code>.</p>
-      <pre class="code"><span class="fn">{{ config(
+      <pre class="code frag"><span class="fn">{{ config(
     materialized=</span><span class="str">'incremental'</span><span class="fn">,
     partition_by={</span><span class="str">'field'</span><span class="fn">: </span><span class="str">'order_date'</span><span class="fn">, </span><span class="str">'data_type'</span><span class="fn">: </span><span class="str">'date'</span><span class="fn">}
 ) }}</span>
@@ -370,29 +412,31 @@
 <span class="fn">{% if is_incremental() %}</span>
 <span class="kw">where</span> order_date > (<span class="kw">select max</span>(order_date) <span class="kw">from</span> <span class="fn">{{ this }}</span>)
 <span class="fn">{% endif %}</span></pre>
-      <p class="lede" style="margin-top:6px;"><code class="mono">is_incremental()</code> is true only after the table already exists, so the first build processes everything, and every run after processes only the rows past the last watermark.</p>
+      <p class="lede frag" style="margin-top:6px;"><code class="mono">is_incremental()</code> is true only after the table already exists, so the first build processes everything, and every run after processes only the rows past the last watermark.</p>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="blue">
       <p class="eyebrow">Keeping re-runs clean</p>
       <h2>unique_key</h2>
       <p class="lede">Incremental models add new rows on every run &mdash; but source data sometimes sends an update to a row you've already loaded. <code class="mono">unique_key</code> tells dbt which column identifies "the same row," so an update replaces instead of duplicating.</p>
-      <pre class="code"><span class="fn">{{ config(
+      <pre class="code frag"><span class="fn">{{ config(
     materialized=</span><span class="str">'incremental'</span><span class="fn">,
     unique_key=</span><span class="str">'order_id'</span><span class="fn">,
     incremental_strategy=</span><span class="str">'merge'</span><span class="fn">
 ) }}</span></pre>
       <div class="cardrow">
-        <div class="card"><span class="tag">No key</span><p>New rows are simply appended &mdash; fine for pure event logs that never change after they land.</p></div>
-        <div class="card"><span class="tag">unique_key set</span><p>dbt issues a BigQuery <b>MERGE</b>: matching keys get updated, new keys get inserted.</p></div>
+        <div class="card frag"><span class="tag">No key</span><p>New rows are simply appended &mdash; fine for pure event logs that never change after they land.</p></div>
+        <div class="card frag"><span class="tag">unique_key set</span><p>dbt issues a BigQuery <b>MERGE</b>: matching keys get updated, new keys get inserted.</p></div>
       </div>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
       <p class="eyebrow">Reusable logic</p>
       <h2>Macros</h2>
       <p class="lede">A macro is a snippet of SQL written once in Jinja and reused across models &mdash; the closest thing dbt has to a function. Anything you'd otherwise copy-paste into ten models, write once instead.</p>
-      <pre class="code"><span class="cm">-- macros/cents_to_dollars.sql</span>
+      <pre class="code frag"><span class="cm">-- macros/cents_to_dollars.sql</span>
 <span class="fn">{% macro cents_to_dollars(column_name) %}</span>
     (<span class="fn">{{ column_name }}</span> / 100)
 <span class="fn">{% endmacro %}</span>
@@ -402,14 +446,15 @@
   order_id,
   <span class="fn">{{ cents_to_dollars(</span><span class="str">'amount_cents'</span><span class="fn">) }}</span> <span class="kw">as</span> amount_dollars
 <span class="kw">from</span> <span class="fn">{{ ref(</span><span class="str">'stg_orders'</span><span class="fn">) }}</span></pre>
-      <p class="lede" style="margin-top:6px;">The macro is expanded at compile time &mdash; BigQuery only ever sees the final, ordinary SQL, so no new query concepts to learn.</p>
+      <p class="lede frag" style="margin-top:6px;">The macro is expanded at compile time &mdash; BigQuery only ever sees the final, ordinary SQL, so no new query concepts to learn.</p>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
       <p class="eyebrow">Catching bad data</p>
       <h2>Built-in tests</h2>
       <p class="lede">A test is a query that should return zero rows. dbt ships four generic tests you attach to a column in <code class="mono">schema.yml</code> &mdash; no SQL to write, just config.</p>
-      <pre class="code"><span class="cm"># models/staging/schema.yml</span>
+      <pre class="code frag"><span class="cm"># models/staging/schema.yml</span>
 <span class="kw">models</span>:
   - <span class="kw">name</span>: stg_orders
     <span class="kw">columns</span>:
@@ -426,21 +471,23 @@
           - relationships:
               <span class="kw">to</span>: <span class="fn">ref(</span><span class="str">'stg_customers'</span><span class="fn">)</span>
               <span class="kw">field</span>: customer_id</pre>
-      <p class="lede" style="margin-top:6px;"><code class="mono">dbt test</code> runs every one of these and reports which rows broke the rule &mdash; caught before anyone downstream sees bad numbers.</p>
+      <p class="lede frag" style="margin-top:6px;"><code class="mono">dbt test</code> runs every one of these and reports which rows broke the rule &mdash; caught before anyone downstream sees bad numbers.</p>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
       <p class="eyebrow">Beyond the four built-ins</p>
       <h2>Custom (singular) tests</h2>
       <p class="lede">Some rules are specific to your business and don't fit <code class="mono">unique</code> or <code class="mono">not_null</code>. A singular test is just a <code class="mono">.sql</code> file that selects the rows that shouldn't exist &mdash; if it returns anything, the test fails.</p>
-      <pre class="code"><span class="cm">-- tests/assert_order_total_is_positive.sql
+      <pre class="code frag"><span class="cm">-- tests/assert_order_total_is_positive.sql
 -- fails if this query returns any rows</span>
 <span class="kw">select</span>
   order_id,
   order_total
 <span class="kw">from</span> <span class="fn">{{ ref(</span><span class="str">'fct_orders'</span><span class="fn">) }}</span>
 <span class="kw">where</span> order_total <= 0</pre>
-      <p class="lede" style="margin-top:6px;">Same <code class="mono">SELECT ... WHERE</code> you already know &mdash; the only new idea is that "passing" means the query comes back empty.</p>
+      <p class="lede frag" style="margin-top:6px;">Same <code class="mono">SELECT ... WHERE</code> you already know &mdash; the only new idea is that "passing" means the query comes back empty.</p>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="blue">
@@ -448,24 +495,25 @@
       <h2>Great Expectations</h2>
       <p class="lede">Great Expectations is a standalone Python framework for data quality &mdash; you write "expectations" like <code class="mono">expect_column_values_to_be_between</code> or <code class="mono">expect_column_mean_to_be_between</code> and run them as a validation suite, independent of dbt.</p>
       <div class="cardrow">
-        <div class="card"><span class="tag">Standalone</span><p>Runs against any table &mdash; BigQuery, a CSV, a pandas DataFrame &mdash; producing a data-docs report of every check.</p></div>
-        <div class="card"><span class="tag">dbt-expectations</span><p>A dbt package that ports many GE expectations into ordinary <code class="mono">tests:</code> entries in <code class="mono">schema.yml</code>.</p></div>
+        <div class="card frag"><span class="tag">Standalone</span><p>Runs against any table &mdash; BigQuery, a CSV, a pandas DataFrame &mdash; producing a data-docs report of every check.</p></div>
+        <div class="card frag"><span class="tag">dbt-expectations</span><p>A dbt package that ports many GE expectations into ordinary <code class="mono">tests:</code> entries in <code class="mono">schema.yml</code>.</p></div>
       </div>
-      <pre class="code"><span class="cm"># schema.yml, using the dbt-expectations package</span>
+      <pre class="code frag"><span class="cm"># schema.yml, using the dbt-expectations package</span>
 <span class="kw">columns</span>:
   - <span class="kw">name</span>: order_total
     <span class="kw">tests</span>:
       - dbt_expectations.expect_column_values_to_be_between:
           <span class="kw">min_value</span>: 0
           <span class="kw">max_value</span>: 100000</pre>
-      <p class="lede" style="margin-top:6px;">dbt's built-in tests answer <i>is this row valid?</i> Great Expectations-style checks can also answer <i>does this whole column still look right?</i> &mdash; ranges, distributions, formats.</p>
+      <p class="lede frag" style="margin-top:6px;">dbt's built-in tests answer <i>is this row valid?</i> Great Expectations-style checks can also answer <i>does this whole column still look right?</i> &mdash; ranges, distributions, formats.</p>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
       <p class="eyebrow">Trust, readably</p>
       <h2>Documentation lives in schema.yml</h2>
       <p class="lede">The same file that holds your tests also holds plain-English descriptions. Write them once, and dbt turns them into a browsable, searchable site.</p>
-      <pre class="code"><span class="cm"># models/marts/schema.yml</span>
+      <pre class="code frag"><span class="cm"># models/marts/schema.yml</span>
 <span class="kw">models</span>:
   - <span class="kw">name</span>: fct_orders
     <span class="kw">description</span>: <span class="str">"One row per order, ready for reporting."</span>
@@ -475,23 +523,25 @@
       - <span class="kw">name</span>: order_total
         <span class="kw">description</span>: <span class="str">"Order amount in USD, after discounts."</span></pre>
       <div class="cardrow">
-        <div class="card"><span class="tag">dbt docs generate</span><p>Builds a static site from every description, test, and <code class="mono">ref()</code>/<code class="mono">source()</code> call in the project.</p></div>
-        <div class="card"><span class="tag">Lineage graph</span><p>The docs site renders the exact dependency network this deck's background is animating &mdash; click a model to see everything upstream and downstream.</p></div>
+        <div class="card frag"><span class="tag">dbt docs generate</span><p>Builds a static site from every description, test, and <code class="mono">ref()</code>/<code class="mono">source()</code> call in the project.</p></div>
+        <div class="card frag"><span class="tag">Lineage graph</span><p>The docs site renders the exact dependency network this deck's background is animating &mdash; click a model to see everything upstream and downstream.</p></div>
       </div>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="blue">
       <p class="eyebrow">Native to BigQuery</p>
       <h2>The APPENDS() table function</h2>
       <p class="lede">BigQuery can hand you exactly the rows added to a table in a time window, without dbt at all. <code class="mono">APPENDS()</code> is a table-valued function &mdash; call it like a table, filter it like one.</p>
-      <pre class="code"><span class="kw">select</span> *
+      <pre class="code frag"><span class="kw">select</span> *
 <span class="kw">from</span> <span class="fn">APPENDS(</span>
   <span class="kw">TABLE</span> mydataset.orders,
   TIMESTAMP(<span class="str">'2024-01-01 00:00:00'</span>),
   TIMESTAMP(<span class="str">'2024-01-02 00:00:00'</span>)
 <span class="fn">)</span>
 <span class="kw">where</span> _CHANGE_TYPE = <span class="str">'INSERT'</span></pre>
-      <p class="lede" style="margin-top:6px;">It reads straight from BigQuery's change history &mdash; no timestamp column of your own required, no rescanning the whole table. Same <code class="mono">SELECT ... WHERE</code> shape you already know.</p>
+      <p class="lede frag" style="margin-top:6px;">It reads straight from BigQuery's change history &mdash; no timestamp column of your own required, no rescanning the whole table. Same <code class="mono">SELECT ... WHERE</code> shape you already know.</p>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="blue">
@@ -499,23 +549,25 @@
       <h2>Recap</h2>
       <table class="spec">
         <tr><th>Concept</th><th>Answers</th></tr>
-        <tr><td><code>source()</code></td><td>Where does this data come from?</td></tr>
-        <tr><td><code>ref()</code></td><td>Which model does this one depend on?</td></tr>
-        <tr><td><code>materialized</code></td><td>What gets physically built &mdash; view, table, incremental, or nothing?</td></tr>
-        <tr><td><code>partition_by</code></td><td>How is the table split up for cheaper, faster scans?</td></tr>
-        <tr><td><code>unique_key</code></td><td>How do re-runs avoid duplicate rows?</td></tr>
-        <tr><td><code>macro</code></td><td>Where does reused SQL logic live?</td></tr>
-        <tr><td>generic / singular tests</td><td>Which rows or values are invalid?</td></tr>
-        <tr><td>Great Expectations</td><td>Does the whole column still look right &mdash; range, format, distribution?</td></tr>
-        <tr><td><code>schema.yml</code> docs</td><td>What does this model or column mean, and what depends on it?</td></tr>
-        <tr><td><code>APPENDS()</code></td><td>Which rows were added between two timestamps?</td></tr>
+        <tr class="frag"><td><code>source()</code></td><td>Where does this data come from?</td></tr>
+        <tr class="frag"><td><code>ref()</code></td><td>Which model does this one depend on?</td></tr>
+        <tr class="frag"><td><code>materialized</code></td><td>What gets physically built &mdash; view, table, incremental, or nothing?</td></tr>
+        <tr class="frag"><td><code>partition_by</code></td><td>How is the table split up for cheaper, faster scans?</td></tr>
+        <tr class="frag"><td><code>unique_key</code></td><td>How do re-runs avoid duplicate rows?</td></tr>
+        <tr class="frag"><td><code>macro</code></td><td>Where does reused SQL logic live?</td></tr>
+        <tr class="frag"><td>generic / singular tests</td><td>Which rows or values are invalid?</td></tr>
+        <tr class="frag"><td>Great Expectations</td><td>Does the whole column still look right &mdash; range, format, distribution?</td></tr>
+        <tr class="frag"><td><code>schema.yml</code> docs</td><td>What does this model or column mean, and what depends on it?</td></tr>
+        <tr class="frag"><td><code>APPENDS()</code></td><td>Which rows were added between two timestamps?</td></tr>
       </table>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
       <p class="eyebrow">End</p>
       <div class="qmark">Questions?</div>
-      <p class="lede">source → ref → materialize → partition → merge on unique_key → wrap the repeated parts in a macro → test it → document it. That's the whole loop most dbt projects run on.</p>
+      <p class="lede frag">source → ref → materialize → partition → merge on unique_key → wrap the repeated parts in a macro → test it → document it. That's the whole loop most dbt projects run on.</p>
+      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
   </main>
@@ -536,23 +588,41 @@
   var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
   var total = slides.length;
   var current = 0;
+  var fragIndex = 0;
   var slideNum = document.getElementById('slideNum');
   var slideTotal = document.getElementById('slideTotal');
   var prevBtn = document.getElementById('prevBtn');
   var nextBtn = document.getElementById('nextBtn');
   var dotsWrap = document.getElementById('dots');
+  var stage = document.querySelector('main.stage');
   slideTotal.textContent = String(total).padStart(2,'0');
 
   var accentMap = { coral: '#ff6f59', blue: '#4c8dff' };
 
-  slides.forEach(function(_, i){
+  slides.forEach(function(s, i){
+    s.__frags = Array.prototype.slice.call(s.querySelectorAll('.frag'));
     var b = document.createElement('button');
     b.className = 'dotbtn';
     b.setAttribute('aria-label', 'Go to slide ' + (i+1));
-    b.addEventListener('click', function(){ go(i); });
+    b.addEventListener('click', function(){ goSlide(i); });
     dotsWrap.appendChild(b);
   });
   var dotEls = Array.prototype.slice.call(dotsWrap.children);
+
+  function applyFragments(){
+    var frags = slides[current].__frags || [];
+    frags.forEach(function(f, i){ f.classList.toggle('revealed', i < fragIndex); });
+    var hint = slides[current].querySelector('.continue-hint');
+    if (hint) hint.classList.toggle('show', fragIndex < frags.length);
+  }
+
+  function revealNext(){
+    var frags = slides[current].__frags || [];
+    if (fragIndex < frags.length){ fragIndex++; applyFragments(); }
+  }
+  function revealPrev(){
+    if (fragIndex > 0){ fragIndex--; applyFragments(); }
+  }
 
   function render(){
     slides.forEach(function(s,i){ s.classList.toggle('active', i===current); });
@@ -566,25 +636,35 @@
     if (window.__setSceneAccent) window.__setSceneAccent(hex);
     slides[current].scrollTop = 0;
   }
-  function go(i){
+  function goSlide(i){
     current = Math.max(0, Math.min(total-1, i));
+    fragIndex = 0;
     render();
+    applyFragments();
   }
-  prevBtn.addEventListener('click', function(){ go(current-1); });
-  nextBtn.addEventListener('click', function(){ go(current+1); });
+  prevBtn.addEventListener('click', function(){ goSlide(current-1); });
+  nextBtn.addEventListener('click', function(){ goSlide(current+1); });
+  var suppressClick = false;
+  stage.addEventListener('click', function(){
+    if (suppressClick){ suppressClick = false; return; }
+    revealNext();
+  });
   window.addEventListener('keydown', function(e){
-    if (e.key==='ArrowRight' || e.key===' ') { go(current+1); e.preventDefault(); }
-    else if (e.key==='ArrowLeft') { go(current-1); e.preventDefault(); }
+    if (e.key==='ArrowRight') { goSlide(current+1); e.preventDefault(); }
+    else if (e.key==='ArrowLeft') { goSlide(current-1); e.preventDefault(); }
+    else if (e.key==='ArrowDown' || e.key===' ') { revealNext(); e.preventDefault(); }
+    else if (e.key==='ArrowUp') { revealPrev(); e.preventDefault(); }
   });
   var touchX = null;
   document.addEventListener('touchstart', function(e){ touchX = e.touches[0].clientX; }, {passive:true});
   document.addEventListener('touchend', function(e){
     if (touchX===null) return;
     var dx = e.changedTouches[0].clientX - touchX;
-    if (Math.abs(dx) > 50) go(current + (dx<0 ? 1 : -1));
+    if (Math.abs(dx) > 50) { suppressClick = true; goSlide(current + (dx<0 ? 1 : -1)); }
     touchX = null;
   }, {passive:true});
   render();
+  applyFragments();
 
   // ---------- three.js data-network background ----------
   var holder = document.getElementById('scene-holder');
