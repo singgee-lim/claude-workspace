@@ -13,10 +13,10 @@
     --bg-2:#0f1419;
     --surface:#131a22;
     --surface-2:#182029;
-    --border:#26313d;
+    --border:#5a6978;
     --text:#e9eef3;
     --text-dim:#93a1b0;
-    --text-faint:#5c6b7a;
+    --text-faint:#7b8b9c;
     --coral:#ff6f59;
     --coral-dim:#ff6f5933;
     --blue:#4c8dff;
@@ -65,21 +65,43 @@
 
   header.topbar{
     display:flex; align-items:center; justify-content:space-between;
+    gap:14px;
     padding: calc(14px + env(safe-area-inset-top,0px)) 24px 12px;
     flex-shrink:0;
+  }
+  .topbar-right{
+    display:flex; align-items:center; gap:14px;
   }
   .brand{
     display:flex; align-items:center; gap:10px;
     font-family:'IBM Plex Mono', monospace;
     font-size:12px; letter-spacing:0.08em; text-transform:uppercase;
     color:var(--text-faint);
+    flex-shrink:0;
   }
   .brand .dot{ width:7px; height:7px; border-radius:50%; background:var(--accent, var(--coral)); box-shadow:0 0 8px var(--accent, var(--coral)); transition:background .4s, box-shadow .4s;}
   .counter{
     font-family:'IBM Plex Mono', monospace;
     font-size:12px; color:var(--text-faint); letter-spacing:0.05em;
+    flex-shrink:0;
   }
   .counter b{ color:var(--text-dim); font-weight:500; }
+
+  .motion-toggle{
+    display:flex; align-items:center; justify-content:center;
+    width:28px; height:28px; flex-shrink:0;
+    border-radius:50%;
+    background:var(--surface-2); border:1px solid var(--border);
+    color:var(--text-dim); font-size:12px;
+    cursor:pointer; transition:border-color .2s, color .2s;
+  }
+  .motion-toggle:hover{ border-color:var(--accent, var(--coral)); color:var(--text); }
+  .motion-toggle svg{ width:13px; height:13px; fill:currentColor; }
+
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
 
   main.stage{
     flex:1;
@@ -248,7 +270,7 @@
   .navbtn:active{ transform:scale(0.94); }
   .navbtn:disabled{ opacity:0.35; cursor:default; }
   .navbtn:disabled:hover{ border-color:var(--border); }
-  .navbtn:focus-visible, .dotbtn:focus-visible{ outline:2px solid var(--accent, var(--coral)); outline-offset:2px; }
+  .navbtn:focus-visible, .dotbtn:focus-visible, .motion-toggle:focus-visible{ outline:2px solid var(--accent, var(--coral)); outline-offset:2px; }
 
   .dots{ display:flex; gap:7px; }
   .dotbtn{
@@ -298,16 +320,31 @@
 </style>
 </head>
 <body>
-<div id="scene-holder"></div>
+<div id="scene-holder" aria-hidden="true"></div>
+
+<p class="sr-only">
+  This is a slide presentation. Press the Down Arrow key, or click anywhere on a slide, to reveal
+  the next point. Press the Up Arrow key to hide the last revealed point again. Press the Right
+  Arrow key for the next slide and the Left Arrow key for the previous slide, or use the Previous,
+  Next, and numbered slide buttons below the deck. All slide content is available to read in full
+  regardless of what has been visually revealed.
+</p>
+<div id="slideAnnounce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
 <div id="deck">
   <header class="topbar">
-    <div class="brand"><span class="dot"></span>dbt <span style="color:var(--text-faint)">×</span> BigQuery</div>
-    <div class="legend"><kbd>↓</kbd> reveal <kbd>↑</kbd> undo <kbd>←</kbd><kbd>→</kbd> slides</div>
-    <div class="counter"><b id="slideNum">01</b> / <span id="slideTotal">11</span></div>
+    <div class="brand"><span class="dot" aria-hidden="true"></span>dbt <span style="color:var(--text-faint)" aria-hidden="true">×</span> BigQuery</div>
+    <div class="topbar-right">
+      <div class="legend" aria-hidden="true"><kbd>↓</kbd> reveal <kbd>↑</kbd> undo <kbd>←</kbd><kbd>→</kbd> slides</div>
+      <button type="button" class="motion-toggle" id="motionToggle" aria-pressed="false" aria-label="Pause background motion">
+        <svg id="motionIconPause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+        <svg id="motionIconPlay" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M7 4.5v15l13-7.5z"></path></svg>
+      </button>
+      <div class="counter"><b id="slideNum">01</b> / <span id="slideTotal">11</span></div>
+    </div>
   </header>
 
-  <main class="stage">
+  <main class="stage" aria-label="Presentation slides">
 
     <section class="slide" data-accent="coral">
       <p class="eyebrow">A short course</p>
@@ -322,7 +359,7 @@
         <span class="darrow">›</span>
         <div class="dstep frag"><b>dashboard</b>trusted numbers</div>
       </div>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
@@ -344,7 +381,7 @@
           <li class="frag"><b>schema.yml docs</b> &amp; <b>APPENDS()</b> &mdash; documentation + change tracking</li>
         </ul>
       </div>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
@@ -368,7 +405,7 @@
 <span class="kw">from</span> <span class="fn">{{ ref(</span><span class="str">'stg_orders'</span><span class="fn">) }}</span>
 <span class="kw">where</span> order_date >= <span class="str">'2024-01-01'</span></pre>
       <p class="lede frag" style="margin-top:6px;">Because <code class="mono">fct_orders</code> calls <code class="mono">ref('stg_orders')</code> instead of typing a table name, dbt knows to build <code class="mono">stg_orders</code> first, every time.</p>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
@@ -380,7 +417,7 @@
         <div class="card frag"><span class="tag">Order</span><p>dbt runs models in the correct sequence, and can run just one branch of the graph.</p></div>
         <div class="card frag"><span class="tag">Environments</span><p><code class="mono">source()</code> and <code class="mono">ref()</code> resolve to the right project/dataset per environment &mdash; dev, staging, prod &mdash; without editing SQL.</p></div>
       </div>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
@@ -395,7 +432,7 @@
         <tr class="frag"><td><b>incremental</b></td><td>Table updated with only new/changed rows</td><td>Large, append-heavy source data</td></tr>
         <tr class="frag"><td><b>ephemeral</b></td><td>Nothing &mdash; inlined as a CTE into callers</td><td>Small reusable snippet, no need for its own object</td></tr>
       </table>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="blue">
@@ -413,7 +450,7 @@
 <span class="kw">where</span> order_date > (<span class="kw">select max</span>(order_date) <span class="kw">from</span> <span class="fn">{{ this }}</span>)
 <span class="fn">{% endif %}</span></pre>
       <p class="lede frag" style="margin-top:6px;"><code class="mono">is_incremental()</code> is true only after the table already exists, so the first build processes everything, and every run after processes only the rows past the last watermark.</p>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="blue">
@@ -429,7 +466,7 @@
         <div class="card frag"><span class="tag">No key</span><p>New rows are simply appended &mdash; fine for pure event logs that never change after they land.</p></div>
         <div class="card frag"><span class="tag">unique_key set</span><p>dbt issues a BigQuery <b>MERGE</b>: matching keys get updated, new keys get inserted.</p></div>
       </div>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
@@ -447,7 +484,7 @@
   <span class="fn">{{ cents_to_dollars(</span><span class="str">'amount_cents'</span><span class="fn">) }}</span> <span class="kw">as</span> amount_dollars
 <span class="kw">from</span> <span class="fn">{{ ref(</span><span class="str">'stg_orders'</span><span class="fn">) }}</span></pre>
       <p class="lede frag" style="margin-top:6px;">The macro is expanded at compile time &mdash; BigQuery only ever sees the final, ordinary SQL, so no new query concepts to learn.</p>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
@@ -472,7 +509,7 @@
               <span class="kw">to</span>: <span class="fn">ref(</span><span class="str">'stg_customers'</span><span class="fn">)</span>
               <span class="kw">field</span>: customer_id</pre>
       <p class="lede frag" style="margin-top:6px;"><code class="mono">dbt test</code> runs every one of these and reports which rows broke the rule &mdash; caught before anyone downstream sees bad numbers.</p>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
@@ -487,7 +524,7 @@
 <span class="kw">from</span> <span class="fn">{{ ref(</span><span class="str">'fct_orders'</span><span class="fn">) }}</span>
 <span class="kw">where</span> order_total <= 0</pre>
       <p class="lede frag" style="margin-top:6px;">Same <code class="mono">SELECT ... WHERE</code> you already know &mdash; the only new idea is that "passing" means the query comes back empty.</p>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="blue">
@@ -506,7 +543,7 @@
           <span class="kw">min_value</span>: 0
           <span class="kw">max_value</span>: 100000</pre>
       <p class="lede frag" style="margin-top:6px;">dbt's built-in tests answer <i>is this row valid?</i> Great Expectations-style checks can also answer <i>does this whole column still look right?</i> &mdash; ranges, distributions, formats.</p>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
@@ -526,7 +563,7 @@
         <div class="card frag"><span class="tag">dbt docs generate</span><p>Builds a static site from every description, test, and <code class="mono">ref()</code>/<code class="mono">source()</code> call in the project.</p></div>
         <div class="card frag"><span class="tag">Lineage graph</span><p>The docs site renders the exact dependency network this deck's background is animating &mdash; click a model to see everything upstream and downstream.</p></div>
       </div>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="blue">
@@ -541,7 +578,7 @@
 <span class="fn">)</span>
 <span class="kw">where</span> _CHANGE_TYPE = <span class="str">'INSERT'</span></pre>
       <p class="lede frag" style="margin-top:6px;">It reads straight from BigQuery's change history &mdash; no timestamp column of your own required, no rescanning the whole table. Same <code class="mono">SELECT ... WHERE</code> shape you already know.</p>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="blue">
@@ -560,22 +597,22 @@
         <tr class="frag"><td><code>schema.yml</code> docs</td><td>What does this model or column mean, and what depends on it?</td></tr>
         <tr class="frag"><td><code>APPENDS()</code></td><td>Which rows were added between two timestamps?</td></tr>
       </table>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
     <section class="slide" data-accent="coral">
       <p class="eyebrow">End</p>
       <div class="qmark">Questions?</div>
       <p class="lede frag">source → ref → materialize → partition → merge on unique_key → wrap the repeated parts in a macro → test it → document it. That's the whole loop most dbt projects run on.</p>
-      <div class="continue-hint"><span class="ico">↓</span> click or press down to continue</div>
+      <div class="continue-hint" aria-hidden="true"><span class="ico">↓</span> click or press down to continue</div>
     </section>
 
   </main>
 
   <footer class="controls">
-    <button class="navbtn" id="prevBtn" aria-label="Previous slide">‹</button>
-    <div class="dots" id="dots"></div>
-    <button class="navbtn" id="nextBtn" aria-label="Next slide">›</button>
+    <button class="navbtn" id="prevBtn" aria-label="Previous slide"><span aria-hidden="true">‹</span></button>
+    <div class="dots" id="dots" role="group" aria-label="Jump to slide"></div>
+    <button class="navbtn" id="nextBtn" aria-label="Next slide"><span aria-hidden="true">›</span></button>
   </footer>
 </div>
 
@@ -595,15 +632,19 @@
   var nextBtn = document.getElementById('nextBtn');
   var dotsWrap = document.getElementById('dots');
   var stage = document.querySelector('main.stage');
+  var announcer = document.getElementById('slideAnnounce');
   slideTotal.textContent = String(total).padStart(2,'0');
 
   var accentMap = { coral: '#ff6f59', blue: '#4c8dff' };
 
   slides.forEach(function(s, i){
     s.__frags = Array.prototype.slice.call(s.querySelectorAll('.frag'));
+    s.setAttribute('role', 'group');
+    s.setAttribute('aria-roledescription', 'slide');
+    s.setAttribute('aria-label', 'Slide ' + (i+1) + ' of ' + total);
     var b = document.createElement('button');
     b.className = 'dotbtn';
-    b.setAttribute('aria-label', 'Go to slide ' + (i+1));
+    b.setAttribute('aria-label', 'Go to slide ' + (i+1) + ' of ' + total);
     b.addEventListener('click', function(){ goSlide(i); });
     dotsWrap.appendChild(b);
   });
@@ -624,22 +665,30 @@
     if (fragIndex > 0){ fragIndex--; applyFragments(); }
   }
 
-  function render(){
+  function render(announce){
     slides.forEach(function(s,i){ s.classList.toggle('active', i===current); });
-    dotEls.forEach(function(d,i){ d.classList.toggle('active', i===current); });
+    dotEls.forEach(function(d,i){
+      d.classList.toggle('active', i===current);
+      if (i===current) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+    });
     slideNum.textContent = String(current+1).padStart(2,'0');
     prevBtn.disabled = current===0;
     nextBtn.disabled = current===total-1;
     var accentKey = slides[current].getAttribute('data-accent') || 'coral';
     var hex = accentMap[accentKey] || accentMap.coral;
     document.documentElement.style.setProperty('--accent', hex);
-    if (window.__setSceneAccent) window.__setSceneAccent(hex);
     slides[current].scrollTop = 0;
+    if (announce && announcer){
+      var heading = slides[current].querySelector('h1, h2');
+      announcer.textContent = 'Slide ' + (current+1) + ' of ' + total + (heading ? ': ' + heading.textContent : '');
+    }
   }
   function goSlide(i){
-    current = Math.max(0, Math.min(total-1, i));
+    var next = Math.max(0, Math.min(total-1, i));
+    if (next === current) return;
+    current = next;
     fragIndex = 0;
-    render();
+    render(true);
     applyFragments();
   }
   prevBtn.addEventListener('click', function(){ goSlide(current-1); });
@@ -650,9 +699,11 @@
     revealNext();
   });
   window.addEventListener('keydown', function(e){
+    var onButton = document.activeElement && document.activeElement.tagName === 'BUTTON';
     if (e.key==='ArrowRight') { goSlide(current+1); e.preventDefault(); }
     else if (e.key==='ArrowLeft') { goSlide(current-1); e.preventDefault(); }
-    else if (e.key==='ArrowDown' || e.key===' ') { revealNext(); e.preventDefault(); }
+    else if (e.key==='ArrowDown') { revealNext(); e.preventDefault(); }
+    else if (e.key===' ' && !onButton) { revealNext(); e.preventDefault(); }
     else if (e.key==='ArrowUp') { revealPrev(); e.preventDefault(); }
   });
   var touchX = null;
@@ -663,90 +714,104 @@
     if (Math.abs(dx) > 50) { suppressClick = true; goSlide(current + (dx<0 ? 1 : -1)); }
     touchX = null;
   }, {passive:true});
-  render();
+  render(false);
   applyFragments();
 
-  // ---------- three.js data-network background ----------
+  // ---------- three.js ambient parallax background ----------
   var holder = document.getElementById('scene-holder');
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var motionToggle = document.getElementById('motionToggle');
+  var iconPause = document.getElementById('motionIconPause');
+  var iconPlay = document.getElementById('motionIconPlay');
+  var paused = reduceMotion; // honor the OS-level preference by default
+
+  function setToggleUI(){
+    motionToggle.setAttribute('aria-pressed', String(paused));
+    motionToggle.setAttribute('aria-label', paused ? 'Resume background motion' : 'Pause background motion');
+    iconPause.style.display = paused ? 'none' : '';
+    iconPlay.style.display = paused ? '' : 'none';
+  }
+  setToggleUI();
+  motionToggle.addEventListener('click', function(){
+    paused = !paused;
+    setToggleUI();
+  });
 
   if (typeof THREE === 'undefined') {
     holder.style.background = 'radial-gradient(ellipse at 50% 30%, #131a22 0%, #0a0d12 70%)';
   } else {
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0.6, 10.5);
+    camera.position.set(0, 0, 12);
 
     var renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     holder.appendChild(renderer.domElement);
 
-    var group = new THREE.Group();
-    scene.add(group);
+    // Soft circular sprite so points read as gentle dots, not hard squares
+    var spriteCanvas = document.createElement('canvas');
+    spriteCanvas.width = spriteCanvas.height = 64;
+    var sctx = spriteCanvas.getContext('2d');
+    var grad = sctx.createRadialGradient(32,32,0,32,32,32);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.5, 'rgba(255,255,255,0.4)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    sctx.fillStyle = grad;
+    sctx.fillRect(0,0,64,64);
+    var dotTexture = new THREE.CanvasTexture(spriteCanvas);
 
-    // Layered DAG: raw -> staging -> intermediate -> mart
-    var layerCounts = [5, 7, 6, 4];
-    var layerX = [-6.5, -2.2, 2.2, 6.5];
-    var nodes = []; // {mesh, layer}
-    var nodeColorCoral = new THREE.Color('#ff6f59');
-    var nodeColorBlue = new THREE.Color('#4c8dff');
-    var nodeGeo = new THREE.SphereGeometry(0.075, 12, 12);
+    // Three depth layers of soft, sparse points for a parallax feel.
+    // Farther layers move less; nearer layers move more.
+    var layerDefs = [
+      { count: 46, z: -9, spread: 15, size: 0.32, opacity: 0.16, parallax: 0.12, color: '#5a7ba0' },
+      { count: 30, z: -4, spread: 13, size: 0.42, opacity: 0.22, parallax: 0.26, color: '#6f88ab' },
+      { count: 16, z:  2, spread: 11, size: 0.55, opacity: 0.30, parallax: 0.46, color: '#8fa4c2' }
+    ];
 
-    layerCounts.forEach(function(count, li){
-      for (var i=0;i<count;i++){
-        var mat = new THREE.MeshBasicMaterial({ color: li%2===0 ? nodeColorBlue : nodeColorCoral, transparent:true, opacity:0.85 });
-        var mesh = new THREE.Mesh(nodeGeo, mat);
-        var spread = 3.4;
-        mesh.position.set(
-          layerX[li] + (Math.random()-0.5)*0.6,
-          (i - (count-1)/2) * (spread/Math.max(count-1,1)) + (Math.random()-0.5)*0.3,
-          (Math.random()-0.5)*2.6
-        );
-        group.add(mesh);
-        nodes.push({ mesh:mesh, layer:li });
+    var layers = layerDefs.map(function(def, li){
+      var positions = new Float32Array(def.count * 3);
+      for (var i=0;i<def.count;i++){
+        positions[i*3]   = (Math.random()-0.5) * def.spread;
+        positions[i*3+1] = (Math.random()-0.5) * def.spread * 0.6;
+        positions[i*3+2] = def.z + (Math.random()-0.5) * 1.5;
       }
+      var geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      var mat = new THREE.PointsMaterial({
+        size: def.size,
+        map: dotTexture,
+        transparent: true,
+        opacity: def.opacity,
+        color: new THREE.Color(def.color),
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      var points = new THREE.Points(geo, mat);
+      var group = new THREE.Group();
+      group.add(points);
+      scene.add(group);
+      return {
+        group: group,
+        parallax: def.parallax,
+        driftAmpX: 0.35 + Math.random()*0.25,
+        driftAmpY: 0.22 + Math.random()*0.18,
+        driftPeriod: 50 + li*22 + Math.random()*20,
+        phase: Math.random() * Math.PI * 2
+      };
     });
 
-    // Edges: connect each node to 1-2 nodes in the next layer
-    var edgeLines = [];
-    var particleData = [];
-    var lineMat = new THREE.LineBasicMaterial({ color: 0x2c3a48, transparent:true, opacity:0.55 });
-
-    for (var li=0; li<layerCounts.length-1; li++){
-      var from = nodes.filter(function(n){ return n.layer===li; });
-      var to = nodes.filter(function(n){ return n.layer===li+1; });
-      from.forEach(function(f){
-        var linkCount = 1 + Math.floor(Math.random()*2);
-        for (var k=0;k<linkCount;k++){
-          var t = to[Math.floor(Math.random()*to.length)];
-          var geo = new THREE.BufferGeometry().setFromPoints([f.mesh.position, t.mesh.position]);
-          var line = new THREE.Line(geo, lineMat);
-          group.add(line);
-          edgeLines.push({ a:f.mesh.position, b:t.mesh.position });
-        }
-      });
+    // Smoothed pointer parallax (mouse/touch); falls back to gentle
+    // autonomous drift alone when there's no pointer input.
+    var pointerX = 0, pointerY = 0, targetX = 0, targetY = 0;
+    function onPointerMove(x, y){
+      targetX = (x / window.innerWidth) * 2 - 1;
+      targetY = (y / window.innerHeight) * 2 - 1;
     }
-
-    // Flow particles traveling along random edges
-    var particleCount = Math.min(46, edgeLines.length*2);
-    var particleGeo = new THREE.SphereGeometry(0.045, 8, 8);
-    var particleMat = new THREE.MeshBasicMaterial({ color: '#ff6f59', transparent:true, opacity:0.9 });
-    var particleMeshes = [];
-    for (var p=0;p<particleCount;p++){
-      var pm = new THREE.Mesh(particleGeo, particleMat.clone());
-      var edge = edgeLines[Math.floor(Math.random()*edgeLines.length)];
-      particleData.push({ mesh:pm, edge:edge, t: Math.random(), speed: 0.15 + Math.random()*0.25 });
-      group.add(pm);
-      particleMeshes.push(pm);
-    }
-
-    window.__setSceneAccent = function(hex){
-      particleMeshes.forEach(function(pm){ pm.material.color.set(hex); });
-    };
-
-    var ambient = new THREE.AmbientLight(0xffffff, 1);
-    scene.add(ambient);
+    window.addEventListener('mousemove', function(e){ onPointerMove(e.clientX, e.clientY); }, { passive:true });
+    window.addEventListener('touchmove', function(e){
+      if (e.touches && e.touches[0]) onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive:true });
 
     function onResize(){
       camera.aspect = window.innerWidth/window.innerHeight;
@@ -756,24 +821,27 @@
     window.addEventListener('resize', onResize);
 
     var clock = new THREE.Clock();
-    var visible = true;
-    document.addEventListener('visibilitychange', function(){ visible = !document.hidden; });
+    var pageVisible = true;
+    document.addEventListener('visibilitychange', function(){ pageVisible = !document.hidden; });
 
     function animate(){
       requestAnimationFrame(animate);
-      if (!visible) return;
+      if (!pageVisible) return;
       var dt = Math.min(clock.getDelta(), 0.05);
+      var t = clock.elapsedTime;
 
-      if (!reduceMotion){
-        group.rotation.y += dt * 0.045;
-        group.rotation.x = Math.sin(Date.now()*0.00012) * 0.08;
+      if (!paused){
+        // heavy smoothing so pointer parallax reads as slow, not reactive
+        pointerX += (targetX - pointerX) * dt * 0.6;
+        pointerY += (targetY - pointerY) * dt * 0.6;
+
+        layers.forEach(function(layer){
+          var driftX = Math.sin(t / layer.driftPeriod + layer.phase) * layer.driftAmpX;
+          var driftY = Math.cos(t / (layer.driftPeriod * 1.3) + layer.phase) * layer.driftAmpY;
+          layer.group.position.x = driftX + pointerX * layer.parallax * 1.4;
+          layer.group.position.y = driftY - pointerY * layer.parallax * 1.4;
+        });
       }
-
-      particleData.forEach(function(pd){
-        if (!reduceMotion) pd.t += dt * pd.speed;
-        if (pd.t > 1){ pd.t = 0; pd.edge = edgeLines[Math.floor(Math.random()*edgeLines.length)]; }
-        pd.mesh.position.lerpVectors(pd.edge.a, pd.edge.b, pd.t);
-      });
 
       renderer.render(scene, camera);
     }
